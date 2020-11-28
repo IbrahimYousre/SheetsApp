@@ -6,10 +6,12 @@ import java.util.Map;
 public class CalculationSheet implements Sheet {
 
     Map<Cell, String> values = new HashMap<>();
+    Map<Cell, SheetFunction> functions = new HashMap<>();
 
     @Override
-    public void setValue(String cellName, String value) {
-        values.put(Cell.fromString(cellName), value);
+    public void setValue(String cellName, SheetFunction function) {
+        functions.put(Cell.fromString(cellName), function);
+        values.put(Cell.fromString(cellName), function.apply(c -> values.getOrDefault(Cell.fromString(c), "")));
     }
 
     @Override

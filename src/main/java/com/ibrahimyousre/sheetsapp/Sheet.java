@@ -2,7 +2,7 @@ package com.ibrahimyousre.sheetsapp;
 
 public interface Sheet {
 
-    void setValue(String cellCoordinate, String value);
+    void setValue(String cellCoordinate, SheetFunction function);
 
     String getValue(String cellCoordinate);
 
