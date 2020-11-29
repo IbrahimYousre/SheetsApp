@@ -1,5 +1,7 @@
 package com.ibrahimyousre.sheetsapp;
 
+import static java.util.Collections.emptySet;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -7,39 +9,45 @@ import java.util.Set;
 
 public class CalculationSheet implements Sheet {
 
-    Map<Cell, String> values = new HashMap<>();
-    Map<Cell, SheetFunction> functions = new HashMap<>();
-    DirectedGraph<Cell> dependencyGraph = new DirectedGraph<>();
-    SheetFunction emptyFunction = (s) -> "";
+    Map<String, String> values = new HashMap<>();
+    Map<String, SheetFunction> functions = new HashMap<>();
+    DirectedGraph<String> dependencyGraph = new DirectedGraph<>();
+    SheetFunction emptyCellFunction = (s) -> "";
 
     @Override
-    public void setValue(String cellName, SheetFunction function) {
-        Cell cell = Cell.fromString(cellName);
+    public void set(String cell, SheetFunction function) {
         functions.put(cell, function);
-        Set<Cell> referencedCells = new HashSet<>();
+        Set<String> referencedCells = new HashSet<>();
         function.apply(c -> {
-            referencedCells.add(Cell.fromString(c));
-            return values.getOrDefault(Cell.fromString(c), "");
+            referencedCells.add(c);
+            return values.getOrDefault(c, "");
         });
         dependencyGraph.setLinks(referencedCells, cell);
         updateValues(cell);
     }
 
-    private void updateValues(Cell cell) {
+    private void updateValues(String cell) {
         dependencyGraph.topologicalSortFrom(cell).forEach(c -> {
-            values.put(c, functions.getOrDefault(c, emptyFunction).apply(this::getValue));
+            values.put(c, functions.getOrDefault(c, emptyCellFunction).apply(this));
         });
     }
 
     @Override
-    public String getValue(String cellName) {
-        return values.getOrDefault(Cell.fromString(cellName), "");
+    public String get(String cell) {
+        return values.getOrDefault(cell, "");
     }
 
     @Override
-    public String[][] render(String startCoordinate, String endCoordinate) {
-        Cell start = Cell.fromString(startCoordinate);
-        Cell end = Cell.fromString(endCoordinate);
+    public void clear(String cell) {
+        dependencyGraph.setLinks(emptySet(), cell);
+        functions.remove(cell);
+        values.remove(cell);
+    }
+
+    @Override
+    public String[][] render(String startCell, String endCell) {
+        Cell start = Cell.fromString(startCell);
+        Cell end = Cell.fromString(endCell);
         if (start.getRow() > end.getRow() || start.getCol() > end.getCol()) {
             throw new IllegalArgumentException();
         }
@@ -47,7 +55,8 @@ public class CalculationSheet implements Sheet {
         Cell i = new Cell(start.getRow(), start.getCol());
         for (; i.getRow() <= end.getRow(); i = i.withRow(i.getRow() + 1).withCol(start.getCol())) {
             for (; i.getCol() <= end.getCol(); i = i.withCol(i.getCol() + 1)) {
-                result[i.getRow() - start.getRow()][i.getCol() - start.getCol()] = values.getOrDefault(i, "");
+                result[i.getRow() - start.getRow()][i.getCol() - start.getCol()] = values
+                        .getOrDefault(i.cellName(), "");
             }
         }
         return result;

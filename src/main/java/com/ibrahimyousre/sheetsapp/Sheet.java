@@ -1,11 +1,11 @@
 package com.ibrahimyousre.sheetsapp;
 
-public interface Sheet {
+public interface Sheet extends SheetAccessor {
 
-    void setValue(String cellCoordinate, SheetFunction function);
+    void set(String cell, SheetFunction function);
 
-    String getValue(String cellCoordinate);
+    void clear(String cell);
 
-    String[][] render(String startCoordinate, String endCoordinate);
+    String[][] render(String startCell, String endCell);
 
 }

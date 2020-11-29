@@ -12,21 +12,30 @@ import org.junit.jupiter.api.Test;
 public class DirectedGraphTest {
 
     @Test
-    public void testTopologicalSort_scenario1() throws Exception {
+    public void testTopologicalSort_linkAdded() throws Exception {
         DirectedGraph<String> directedGraph = new DirectedGraph<>();
         directedGraph.setLinks(asSet("B"), "A");
         assertThat(directedGraph.topologicalSortFrom("A")).containsExactly("A");
-        assertThat(directedGraph.topologicalSortFrom("B")).contains("B", "A");
+        assertThat(directedGraph.topologicalSortFrom("B")).containsExactly("B", "A");
     }
 
     @Test
-    public void testTopologicalSort_scenario2() throws Exception {
+    public void testTopologicalSort_linkRemoved() throws Exception {
+        DirectedGraph<String> directedGraph = new DirectedGraph<>();
+        directedGraph.setLinks(asSet("B"), "A");
+        directedGraph.setLinks(asSet(), "A");
+        assertThat(directedGraph.topologicalSortFrom("A")).containsExactly("A");
+        assertThat(directedGraph.topologicalSortFrom("B")).containsExactly("B");
+    }
+
+    @Test
+    public void testTopologicalSort_linkAdded2() throws Exception {
         DirectedGraph<String> directedGraph = new DirectedGraph<>();
         directedGraph.setLinks(asSet("B", "C"), "A");
         directedGraph.setLinks(asSet("C"), "B");
-        assertThat(directedGraph.topologicalSortFrom("A")).contains("A");
-        assertThat(directedGraph.topologicalSortFrom("B")).contains("B", "A");
-        assertThat(directedGraph.topologicalSortFrom("C")).contains("C", "B", "A");
+        assertThat(directedGraph.topologicalSortFrom("A")).containsExactly("A");
+        assertThat(directedGraph.topologicalSortFrom("B")).containsExactly("B", "A");
+        assertThat(directedGraph.topologicalSortFrom("C")).containsExactly("C", "B", "A");
     }
 
     @Test
@@ -36,7 +45,7 @@ public class DirectedGraphTest {
         directedGraph.setLinks(asSet("B"), "C");
         directedGraph.setLinks(asSet("C"), "A");
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            assertThat(directedGraph.topologicalSortFrom("A")).contains("A");
+            assertThat(directedGraph.topologicalSortFrom("A")).containsExactly("A");
         });
         assertThat(exception).hasMessage("Cycle Found!");
     }

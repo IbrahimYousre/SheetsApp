@@ -2,6 +2,8 @@ package com.ibrahimyousre.sheetsapp;
 
 import static com.ibrahimyousre.sheetsapp.utils.CellUtils.*;
 
+import com.ibrahimyousre.sheetsapp.utils.CellUtils;
+
 import lombok.Value;
 import lombok.With;
 
@@ -23,5 +25,9 @@ public class Cell {
         int col = getColumnNumber(cellName.substring(0, i));
         int row = Integer.parseInt(cellName.substring(i));
         return new Cell(row, col);
+    }
+
+    public String cellName() {
+        return CellUtils.getColumnName(col) + row;
     }
 }
