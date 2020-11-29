@@ -15,4 +15,16 @@ public final class SheetFunctions {
         return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) + b.getValueAsDouble(sheet));
     }
 
+    public static SheetFunction subtract(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) - b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction multiply(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) * b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction divide(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) / b.getValueAsDouble(sheet));
+    }
+
 }

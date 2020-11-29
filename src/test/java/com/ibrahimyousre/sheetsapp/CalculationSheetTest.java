@@ -88,12 +88,33 @@ class CalculationSheetTest {
 
     @Test
     public void testSumTwoColumns() {
-        sheet.set("A1", constant("1"));
-        sheet.set("B1", constant("1"));
-        sheet.set("C1", sum(reference("A1"), reference("B1")));
-        assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(2);
         sheet.set("A1", constant("2"));
         sheet.set("B1", constant("3"));
+        sheet.set("C1", sum(reference("A1"), reference("B1")));
+        assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(5);
+    }
+
+    @Test
+    public void testSubtractTwoColumns() {
+        sheet.set("A1", constant("10"));
+        sheet.set("B1", constant("3"));
+        sheet.set("C1", subtract(reference("A1"), reference("B1")));
+        assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(7);
+    }
+
+    @Test
+    public void testMultiplyTwoColumns() {
+        sheet.set("A1", constant("10"));
+        sheet.set("B1", constant("3"));
+        sheet.set("C1", multiply(reference("A1"), reference("B1")));
+        assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(30);
+    }
+
+    @Test
+    public void testDivideTwoColumns() {
+        sheet.set("A1", constant("10"));
+        sheet.set("B1", constant("2"));
+        sheet.set("C1", divide(reference("A1"), reference("B1")));
         assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(5);
     }
 
