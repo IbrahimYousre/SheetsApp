@@ -1,5 +1,11 @@
 package com.ibrahimyousre.sheetsapp.utils;
 
+import java.util.Arrays;
+import java.util.function.Consumer;
+
+import lombok.Getter;
+import lombok.Value;
+
 public final class CellUtils {
     private CellUtils() {
     }
@@ -44,5 +50,59 @@ public final class CellUtils {
             col /= 26;
         }
         return sb.reverse().toString();
+    }
+
+    public static int getRow(String cell) {
+        int i = skipAlphabetic(cell, 0);
+        return Integer.parseInt(cell.substring(i));
+    }
+
+    public static int getCol(String cell) {
+        int i = skipAlphabetic(cell, 0);
+        return getColumnNumber(cell.substring(0, i));
+    }
+
+    public static RangeInformation getRangeInformation(String startCell, String endCell) {
+        int[] rowsRange = {getRow(startCell), getRow(endCell)};
+        int[] colsRange = {getCol(startCell), getCol(endCell)};
+        Arrays.sort(rowsRange);
+        Arrays.sort(colsRange);
+        return new RangeInformation(rowsRange[0], rowsRange[1], colsRange[0], colsRange[1]);
+    }
+
+    public static void iterateCellRange(String startCell, String endCell, Consumer<CellIteratorInformation> callback) {
+        RangeInformation rangeInformation = getRangeInformation(startCell, endCell);
+        CellIteratorInformation cell = new CellIteratorInformation();
+        for (int row = rangeInformation.startRow; row <= rangeInformation.endRow; row++) {
+            for (int col = rangeInformation.startCol; col <= rangeInformation.endCol; col++) {
+                cell.row = row;
+                cell.col = col;
+                cell.offsetRow = row - rangeInformation.startRow;
+                cell.offsetCol = col - rangeInformation.startCol;
+                callback.accept(cell);
+            }
+        }
+    }
+
+    @Value
+    public static class RangeInformation {
+        int startRow, endRow, startCol, endCol;
+
+        public int getWidth() {
+            return endCol - startCol + 1;
+        }
+
+        public int getHeight() {
+            return endRow - startRow + 1;
+        }
+    }
+
+    @Getter
+    public static class CellIteratorInformation {
+        int row, col, offsetRow, offsetCol;
+
+        public String getCellName() {
+            return getColumnName(col) + row;
+        }
     }
 }
