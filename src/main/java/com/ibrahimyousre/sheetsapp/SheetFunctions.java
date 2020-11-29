@@ -7,7 +7,12 @@ public final class SheetFunctions {
         return (sheet) -> value;
     }
 
-    public static SheetFunction reference(String value) {
-        return (sheet) -> sheet.get(value);
+    public static SheetFunction reference(String cell) {
+        return (sheet) -> sheet.get(cell);
     }
+
+    public static SheetFunction sum(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) + b.getValueAsDouble(sheet));
+    }
+
 }

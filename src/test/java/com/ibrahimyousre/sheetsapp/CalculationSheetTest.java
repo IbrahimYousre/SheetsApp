@@ -86,4 +86,15 @@ class CalculationSheetTest {
         });
     }
 
+    @Test
+    public void testSumTwoColumns() throws Exception {
+        sheet.set("A1", constant("1"));
+        sheet.set("B1", constant("1"));
+        sheet.set("C1", sum(reference("A1"), reference("B1")));
+        assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(2);
+        sheet.set("A1", constant("2"));
+        sheet.set("B1", constant("3"));
+        assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(5);
+    }
+
 }

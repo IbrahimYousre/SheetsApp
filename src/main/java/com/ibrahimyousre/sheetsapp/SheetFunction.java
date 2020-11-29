@@ -1,7 +1,12 @@
 package com.ibrahimyousre.sheetsapp;
 
-import java.util.function.Function;
-
 @FunctionalInterface
-public interface SheetFunction extends Function<SheetAccessor, String> {
+public interface SheetFunction {
+
+    String getValue(SheetAccessor sheetAccessor);
+
+    default double getValueAsDouble(SheetAccessor sheetAccessor) {
+        return Double.parseDouble(getValue(sheetAccessor));
+    }
+
 }
