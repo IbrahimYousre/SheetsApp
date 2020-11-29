@@ -33,19 +33,17 @@ class CalculationSheetTest {
     public void testRenderCell() {
         sheet.set("A1", constant("1"));
         String[][] render = sheet.render("A1", "A1");
-        assertThat(render).hasDimensions(1, 1)
-                .isDeepEqualTo(new String[][]{{"1"}});
+        assertThat(render).isDeepEqualTo(new String[][]{{"1"}});
     }
 
     @Test
     public void testRenderRange() {
         sheet.set("A1", constant("1"));
         String[][] render = sheet.render("A1", "B2");
-        assertThat(render).hasDimensions(2, 2)
-                .isDeepEqualTo(new String[][]{
-                        {"1", ""},
-                        {"", ""}
-                });
+        assertThat(render).isDeepEqualTo(new String[][]{
+                {"1", ""},
+                {"", ""}
+        });
     }
 
     @Test
@@ -53,20 +51,18 @@ class CalculationSheetTest {
         sheet.set("A1", constant("1"));
         sheet.set("B1", reference("A1"));
         String[][] render = sheet.render("A1", "B1");
-        assertThat(render).hasDimensions(1, 2)
-                .isDeepEqualTo(new String[][]{
-                        {"1", "1"}
-                });
+        assertThat(render).isDeepEqualTo(new String[][]{
+                {"1", "1"}
+        });
     }
 
     @Test
     public void testCellReference_emptyCell() {
         sheet.set("A1", reference("B1"));
         String[][] render = sheet.render("A1", "B1");
-        assertThat(render).hasDimensions(1, 2)
-                .isDeepEqualTo(new String[][]{
-                        {"", ""}
-                });
+        assertThat(render).isDeepEqualTo(new String[][]{
+                {"", ""}
+        });
     }
 
     @Test
@@ -75,10 +71,9 @@ class CalculationSheetTest {
         sheet.set("B1", reference("A1"));
         sheet.set("A1", constant("2"));
         String[][] render = sheet.render("A1", "B1");
-        assertThat(render).hasDimensions(1, 2)
-                .isDeepEqualTo(new String[][]{
-                        {"2", "2"}
-                });
+        assertThat(render).isDeepEqualTo(new String[][]{
+                {"2", "2"}
+        });
     }
 
     @Test
@@ -86,10 +81,9 @@ class CalculationSheetTest {
         sheet.set("A1", reference("B1"));
         sheet.set("B1", constant("2"));
         String[][] render = sheet.render("A1", "B1");
-        assertThat(render).hasDimensions(1, 2)
-                .isDeepEqualTo(new String[][]{
-                        {"2", "2"}
-                });
+        assertThat(render).isDeepEqualTo(new String[][]{
+                {"2", "2"}
+        });
     }
 
 }
