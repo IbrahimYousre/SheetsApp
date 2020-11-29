@@ -43,7 +43,7 @@ public final class CellUtils {
         return col;
     }
 
-    public static String getColumnName(long col) {
+    public static String getColumnName(int col) {
         StringBuilder sb = new StringBuilder();
         while (col-- > 0) {
             sb.append((char) ((col) % 26 + 'A'));
@@ -60,6 +60,10 @@ public final class CellUtils {
     public static int getCol(String cell) {
         int i = skipAlphabetic(cell, 0);
         return getColumnNumber(cell.substring(0, i));
+    }
+
+    public static String getCellName(int row, int col) {
+        return getColumnName(col) + row;
     }
 
     public static RangeInformation getRangeInformation(String startCell, String endCell) {
@@ -102,7 +106,7 @@ public final class CellUtils {
         int row, col, offsetRow, offsetCol;
 
         public String getCellName() {
-            return getColumnName(col) + row;
+            return CellUtils.getCellName(row, col);
         }
     }
 }
