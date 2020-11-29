@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 public class DirectedGraphTest {
 
     @Test
-    public void testTopologicalSort_linkAdded() throws Exception {
+    public void testTopologicalSort_linkAdded() {
         DirectedGraph<String> directedGraph = new DirectedGraph<>();
         directedGraph.setLinks(asSet("B"), "A");
         assertThat(directedGraph.topologicalSortFrom("A")).containsExactly("A");
@@ -20,7 +20,7 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void testTopologicalSort_linkRemoved() throws Exception {
+    public void testTopologicalSort_linkRemoved() {
         DirectedGraph<String> directedGraph = new DirectedGraph<>();
         directedGraph.setLinks(asSet("B"), "A");
         directedGraph.setLinks(asSet(), "A");
@@ -29,7 +29,7 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void testTopologicalSort_linkAdded2() throws Exception {
+    public void testTopologicalSort_linkAdded2() {
         DirectedGraph<String> directedGraph = new DirectedGraph<>();
         directedGraph.setLinks(asSet("B", "C"), "A");
         directedGraph.setLinks(asSet("C"), "B");
@@ -39,14 +39,13 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void testTopologicalSort_cycleDetection() throws Exception {
+    public void testTopologicalSort_cycleDetection() {
         DirectedGraph<String> directedGraph = new DirectedGraph<>();
         directedGraph.setLinks(asSet("A"), "B");
         directedGraph.setLinks(asSet("B"), "C");
         directedGraph.setLinks(asSet("C"), "A");
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            assertThat(directedGraph.topologicalSortFrom("A")).containsExactly("A");
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> directedGraph.topologicalSortFrom("A"));
         assertThat(exception).hasMessage("Cycle Found!");
     }
 

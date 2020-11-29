@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 public class DirectedGraph<K> {
-    Map<K, Node> nodeMap = new HashMap<>();
+    private final Map<K, Node> nodeMap = new HashMap<>();
 
     void setLinks(Set<K> from, K to) {
         Node toNode = nodeMap.computeIfAbsent(to, Node::new);

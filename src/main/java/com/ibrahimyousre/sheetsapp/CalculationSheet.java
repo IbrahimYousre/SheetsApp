@@ -9,10 +9,10 @@ import java.util.Set;
 
 public class CalculationSheet implements Sheet {
 
-    Map<String, String> values = new HashMap<>();
-    Map<String, SheetFunction> functions = new HashMap<>();
-    DirectedGraph<String> dependencyGraph = new DirectedGraph<>();
-    SheetFunction emptyCellFunction = (s) -> "";
+    private final Map<String, String> values = new HashMap<>();
+    private final Map<String, SheetFunction> functions = new HashMap<>();
+    private final DirectedGraph<String> dependencyGraph = new DirectedGraph<>();
+    private final SheetFunction emptyCellFunction = (s) -> "";
 
     @Override
     public void set(String cell, SheetFunction function) {
@@ -27,9 +27,8 @@ public class CalculationSheet implements Sheet {
     }
 
     private void updateValues(String cell) {
-        dependencyGraph.topologicalSortFrom(cell).forEach(c -> {
-            values.put(c, functions.getOrDefault(c, emptyCellFunction).apply(this));
-        });
+        dependencyGraph.topologicalSortFrom(cell)
+                .forEach(c -> values.put(c, functions.getOrDefault(c, emptyCellFunction).apply(this)));
     }
 
     @Override

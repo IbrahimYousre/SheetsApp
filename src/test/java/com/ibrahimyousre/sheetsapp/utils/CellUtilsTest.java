@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class CellUtilsTest {
 
     @Test
-    public void testGetColumnName() throws Exception {
+    public void testGetColumnName() {
         assertThat(getColumnName(1)).isEqualTo("A");
         assertThat(getColumnName(26)).isEqualTo("Z");
         assertThat(getColumnName(27)).isEqualTo("AA");
@@ -18,7 +18,7 @@ class CellUtilsTest {
     }
 
     @Test
-    public void testGetColumnNumber() throws Exception {
+    public void testGetColumnNumber() {
         assertThat(getColumnNumber("A")).isEqualTo(1);
         assertThat(getColumnNumber("Z")).isEqualTo(26);
         assertThat(getColumnNumber("AA")).isEqualTo(27);
@@ -28,7 +28,7 @@ class CellUtilsTest {
     }
 
     @Test
-    public void testIsValidCellName() throws Exception {
+    public void testIsValidCellName() {
         assertThat(isValidCellName(null)).isEqualTo(false);
         assertThat(isValidCellName("")).isEqualTo(false);
         assertThat(isValidCellName("1")).isEqualTo(false);
@@ -40,7 +40,7 @@ class CellUtilsTest {
     }
 
     @Test
-    public void testIsValidColumnName() throws Exception {
+    public void testIsValidColumnName() {
         assertThat(isValidColumnName(null)).isEqualTo(false);
         assertThat(isValidColumnName("")).isEqualTo(false);
         assertThat(isValidColumnName("A")).isEqualTo(true);
