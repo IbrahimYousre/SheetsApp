@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
 import com.ibrahimyousre.sheetsapp.utils.CellUtils;
 
 public class CalculationSheet implements Sheet {

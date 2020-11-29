@@ -1,6 +1,6 @@
 package com.ibrahimyousre.sheetsapp;
 
-import static com.ibrahimyousre.sheetsapp.SheetFunctions.*;
+import static com.ibrahimyousre.sheetsapp.functions.SheetFunctions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -87,7 +87,7 @@ class CalculationSheetTest {
     }
 
     @Test
-    public void testSumTwoColumns() throws Exception {
+    public void testSumTwoColumns() {
         sheet.set("A1", constant("1"));
         sheet.set("B1", constant("1"));
         sheet.set("C1", sum(reference("A1"), reference("B1")));

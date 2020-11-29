@@ -1,4 +1,4 @@
-package com.ibrahimyousre.sheetsapp;
+package com.ibrahimyousre.sheetsapp.functions;
 
 @FunctionalInterface
 public interface SheetFunction {
