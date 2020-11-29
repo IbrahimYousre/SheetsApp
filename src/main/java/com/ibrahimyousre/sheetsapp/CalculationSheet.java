@@ -1,17 +1,34 @@
 package com.ibrahimyousre.sheetsapp;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class CalculationSheet implements Sheet {
 
     Map<Cell, String> values = new HashMap<>();
     Map<Cell, SheetFunction> functions = new HashMap<>();
+    DirectedGraph<Cell> dependencyGraph = new DirectedGraph<>();
+    SheetFunction emptyFunction = (s) -> "";
 
     @Override
     public void setValue(String cellName, SheetFunction function) {
-        functions.put(Cell.fromString(cellName), function);
-        values.put(Cell.fromString(cellName), function.apply(c -> values.getOrDefault(Cell.fromString(c), "")));
+        Cell cell = Cell.fromString(cellName);
+        functions.put(cell, function);
+        Set<Cell> referencedCells = new HashSet<>();
+        function.apply(c -> {
+            referencedCells.add(Cell.fromString(c));
+            return values.getOrDefault(Cell.fromString(c), "");
+        });
+        dependencyGraph.setLinks(referencedCells, cell);
+        updateValues(cell);
+    }
+
+    private void updateValues(Cell cell) {
+        dependencyGraph.topologicalSortFrom(cell).forEach(c -> {
+            values.put(c, functions.getOrDefault(c, emptyFunction).apply(this::getValue));
+        });
     }
 
     @Override
