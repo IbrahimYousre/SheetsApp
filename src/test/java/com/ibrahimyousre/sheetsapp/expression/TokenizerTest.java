@@ -1,10 +1,10 @@
 package com.ibrahimyousre.sheetsapp.expression;
 
-import static com.ibrahimyousre.sheetsapp.expression.TokenFactory.*;
 import static com.ibrahimyousre.sheetsapp.expression.TokenType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import com.ibrahimyousre.sheetsapp.expression.token.Token;
 import com.ibrahimyousre.sheetsapp.expression.token.Tokenizer;
 
 class TokenizerTest {
@@ -58,7 +58,7 @@ class TokenizerTest {
 
     @Test
     public void testExampleExpression() {
-        assertThat(tokenizer.getTokens("1*2-5^A1+sum(A1:A5)")).containsExactly(
+        assertThat(tokenizer.getTokens("1*2-5^A1+sum(A1:A5)>1")).containsExactly(
                 numberLiteral("1", 0),
                 operationToken(MULTIPLY, 1),
                 numberLiteral("2", 2),
@@ -72,8 +72,26 @@ class TokenizerTest {
                 identifierLiteral("A1", 13),
                 operationToken(RANGE, 15),
                 identifierLiteral("A5", 16),
-                operationToken(RP, 18)
+                operationToken(RP, 18),
+                operationToken(GT, 19),
+                numberLiteral("1", 20)
         );
+    }
+
+    public static Token operationToken(TokenType type, int startPos) {
+        return new Token(type, startPos);
+    }
+
+    public static Token stringLiteral(String data, int startPos) {
+        return new Token(TokenType.STRING_LITERAL, data, startPos);
+    }
+
+    public static Token numberLiteral(String data, int startPos) {
+        return new Token(TokenType.NUMBER_LITERAL, data, startPos);
+    }
+
+    public static Token identifierLiteral(String data, int startPos) {
+        return new Token(TokenType.IDENTIFIER_LITERAL, data, startPos);
     }
 
 }

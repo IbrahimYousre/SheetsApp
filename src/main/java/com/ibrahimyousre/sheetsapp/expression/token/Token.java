@@ -10,16 +10,23 @@ public class Token {
     int length;
 
     public Token(ITokenType type, String data, int startPos) {
-        if (type.isDeterministic() ^ data == null) {
+        if (type.isDeterministic() && data == null) {
             throw new IllegalArgumentException();
         }
         this.type = type;
         this.data = data;
         this.startPos = startPos;
-        this.length = type.isDeterministic() ? type.getLength() : data.length();
+        this.length = data.length();
     }
 
     public Token(ITokenType type, int startPos) {
-        this(type, null, startPos);
+        if (!type.isDeterministic()) {
+            throw new IllegalArgumentException();
+        }
+        this.type = type;
+        this.data = null;
+        this.startPos = startPos;
+        this.length = type.getLength();
     }
+
 }
