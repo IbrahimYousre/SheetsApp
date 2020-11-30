@@ -3,7 +3,7 @@ package com.ibrahimyousre.sheetsapp.expression.token;
 import java.util.List;
 
 public class CompositeTokenMatcher implements TokenMatcher {
-    private List<TokenMatcher> tokenMatchers;
+    private final List<TokenMatcher> tokenMatchers;
 
     public CompositeTokenMatcher(List<TokenMatcher> tokenMatchers) {
         this.tokenMatchers = tokenMatchers;

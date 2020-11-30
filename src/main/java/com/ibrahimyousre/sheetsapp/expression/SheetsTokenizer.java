@@ -10,7 +10,7 @@ import com.ibrahimyousre.sheetsapp.expression.token.Tokenizer;
 public class SheetsTokenizer extends Tokenizer {
     public SheetsTokenizer() {
         super(new CompositeTokenMatcher(asList(
-                new DeterministicTokenMatcher(true),
+                new DeterministicTokenMatcher(true, asList(TokenType.values())),
                 new RegularTokenMatcher(TokenType.STRING_LITERAL),
                 new RegularTokenMatcher(TokenType.NUMBER_LITERAL),
                 new RegularTokenMatcher(TokenType.IDENTIFIER_LITERAL)

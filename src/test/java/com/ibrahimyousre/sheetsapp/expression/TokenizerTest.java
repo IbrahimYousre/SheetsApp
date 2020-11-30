@@ -9,10 +9,10 @@ import com.ibrahimyousre.sheetsapp.expression.token.Tokenizer;
 
 class TokenizerTest {
 
-    Tokenizer tokenizer = new SheetsTokenizer();
+    private final Tokenizer tokenizer = new SheetsTokenizer();
 
     @Test
-    public void testStringLiteral() throws Exception {
+    public void testStringLiteral() {
         assertThat(tokenizer.getTokens("'ibrahim'")).containsExactly(
                 stringLiteral("'ibrahim'", 0)
         );
@@ -22,7 +22,7 @@ class TokenizerTest {
     }
 
     @Test
-    public void testNumberLiteral() throws Exception {
+    public void testNumberLiteral() {
         assertThat(tokenizer.getTokens("1")).containsExactly(
                 numberLiteral("1", 0)
         );
@@ -32,7 +32,7 @@ class TokenizerTest {
     }
 
     @Test
-    public void testIdentifierLiteral() throws Exception {
+    public void testIdentifierLiteral() {
         assertThat(tokenizer.getTokens("a")).containsExactly(
                 identifierLiteral("a", 0)
         );
@@ -57,7 +57,7 @@ class TokenizerTest {
     }
 
     @Test
-    public void testExampleExpression() throws Exception {
+    public void testExampleExpression() {
         assertThat(tokenizer.getTokens("1*2-5^A1+sum(A1:A5)")).containsExactly(
                 numberLiteral("1", 0),
                 operationToken(MULTIPLY, 1),

@@ -1,84 +1,42 @@
 package com.ibrahimyousre.sheetsapp.expression.token;
 
-import static com.ibrahimyousre.sheetsapp.expression.TokenFactory.operationToken;
-import static com.ibrahimyousre.sheetsapp.expression.TokenType.*;
+import static java.util.stream.Collectors.toList;
+
+import java.util.Comparator;
+import java.util.List;
 
 public class DeterministicTokenMatcher implements TokenMatcher {
-    private boolean ignoreWhiteSpace;
+    private final static Comparator<String> PREFIX_LAST_COMPARATOR =
+            ((Comparator<String>) (a, b) -> a.equals(b) ? 0 : (a.startsWith(b) ? -1 : (b.startsWith(a) ? 1 : 0)))
+                    .thenComparing(Comparator.naturalOrder());
+    private final boolean ignoreWhiteSpace;
+    private final List<ITokenType> tokenTypes;
 
-    public DeterministicTokenMatcher(boolean ignoreWhiteSpace) {
+    public DeterministicTokenMatcher(boolean ignoreWhiteSpace, List<ITokenType> tokenTypes) {
         this.ignoreWhiteSpace = ignoreWhiteSpace;
+        this.tokenTypes = tokenTypes.stream().filter(ITokenType::isDeterministic)
+                .sorted(Comparator.comparing(ITokenType::getValue, PREFIX_LAST_COMPARATOR))
+                .collect(toList());
     }
 
     @Override
     public Token getTokenIfMatched(char[] chars, int pos) {
         char ch = chars[pos];
         if (ignoreWhiteSpace && isWhiteSpace(ch)) { return null; }
-        Token token = null;
-        switch (ch) {
-            case '(':
-                token = operationToken(LP, pos);
-                break;
-            case ')':
-                token = operationToken(RP, pos);
-                break;
-            case ',':
-                token = operationToken(COMMA, pos);
-                break;
-            case ':':
-                token = operationToken(RANGE, pos);
-                break;
-            case '+':
-                token = operationToken(PLUS, pos);
-                break;
-            case '-':
-                token = operationToken(MINUS, pos);
-                break;
-            case '*':
-                token = operationToken(MULTIPLY, pos);
-                break;
-            case '/':
-                token = operationToken(DIVIDE, pos);
-                break;
-            case '%':
-                token = operationToken(MOD, pos);
-                break;
-            case '^':
-                token = operationToken(POWER, pos);
-                break;
-            case '>':
-                if (peekNext(chars, pos, '=')) {
-                    token = operationToken(GE, pos);
-                } else {
-                    token = operationToken(GT, pos);
-                }
-                break;
-            case '<':
-                if (peekNext(chars, pos, '=')) {
-                    token = operationToken(LE, pos);
-                } else {
-                    token = operationToken(LT, pos);
-                }
-                break;
-            case '=':
-                if (peekNext(chars, pos, '=')) {
-                    token = operationToken(EQ, pos);
-                }
-                break;
-            case '!':
-                if (peekNext(chars, pos, '=')) {
-                    token = operationToken(NE, pos);
-                }
-                break;
-        }
-        return token;
+        // todo: optimize with binary search
+        return tokenTypes.stream().filter(tokenType -> startsWith(chars, pos, tokenType.getValue())).findFirst()
+                .map(tokenType -> new Token(tokenType, pos))
+                .orElse(null);
     }
 
     private boolean isWhiteSpace(char c) {
         return (c == ' ' || c == '\t' || c == '\r' || c == '\n');
     }
 
-    private boolean peekNext(char[] chars, int current, char ch) {
-        return current + 1 < chars.length && chars[current + 1] == ch;
+    private boolean startsWith(char[] chars, int pos, String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (i + pos >= chars.length || chars[i + pos] != value.charAt(i)) { return false; }
+        }
+        return true;
     }
 }

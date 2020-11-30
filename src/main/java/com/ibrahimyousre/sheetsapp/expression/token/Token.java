@@ -18,4 +18,8 @@ public class Token {
         this.startPos = startPos;
         this.length = type.isDeterministic() ? type.getLength() : data.length();
     }
+
+    public Token(ITokenType type, int startPos) {
+        this(type, null, startPos);
+    }
 }
