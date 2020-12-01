@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibrahimyousre.sheetsapp.expression.ExpressionParser;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
 import com.ibrahimyousre.sheetsapp.utils.CellUtils;
 
@@ -17,9 +18,15 @@ public class CalculationSheet implements Sheet {
     private final Map<String, SheetFunction> functions = new HashMap<>();
     private final DirectedGraph<String> dependencyGraph = new DirectedGraph<>();
     private final SheetFunction emptyCellFunction = (s) -> "";
+    private final ExpressionParser expressionParser;
+
+    public CalculationSheet(ExpressionParser expressionParser) {
+        this.expressionParser = expressionParser;
+    }
 
     @Override
-    public void set(String cell, SheetFunction function) {
+    public void set(String cell, String expression) {
+        SheetFunction function = expressionParser.parse(expression);
         functions.put(cell, function);
         Set<String> referencedCells = new HashSet<>();
         function.getValue(c -> {
