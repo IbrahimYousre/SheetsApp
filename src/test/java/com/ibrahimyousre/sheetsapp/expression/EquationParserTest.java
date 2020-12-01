@@ -14,4 +14,10 @@ class EquationParserTest {
                 .isEqualTo("1");
     }
 
+    @Test
+    public void testParseStringLiteral() throws Exception {
+        assertThat(equationParser.parseEquation("'Hello World'").getValue(null))
+                .isEqualTo("Hello World");
+    }
+
 }
