@@ -1,20 +1,22 @@
 package com.ibrahimyousre.sheetsapp.expression;
 
+import static com.ibrahimyousre.sheetsapp.functions.SheetFunctions.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ibrahimyousre.sheetsapp.expression.token.Token;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
-import com.ibrahimyousre.sheetsapp.functions.SheetFunctions;
 
 public class EquationParser {
     SheetsTokenizer tokenizer = new SheetsTokenizer();
     private List<Token<TokenType>> tokens;
-    private int current = 0;
+    private int current;
 
     SheetFunction parseEquation(String equation) {
         tokens = tokenizer.getTokens(equation);
+        current = 0;
         return constantLiteral();
     }
 
@@ -23,6 +25,8 @@ public class EquationParser {
             return numberLiteral();
         } else if (accept(TokenType.STRING_LITERAL)) {
             return stringLiteral();
+        } else if (accept(TokenType.CELL_REFERENCE_LITERAL)) {
+            return cellReferenceLiteral();
         } else {
             throw failExpectation(TokenType.NUMBER_LITERAL, TokenType.STRING_LITERAL);
         }
@@ -30,13 +34,18 @@ public class EquationParser {
 
     SheetFunction numberLiteral() {
         Token<TokenType> token = consume(TokenType.NUMBER_LITERAL);
-        return SheetFunctions.constant(token.getData());
+        return constant(token.getData());
     }
 
     SheetFunction stringLiteral() {
         Token<TokenType> token = consume(TokenType.STRING_LITERAL);
         String quotedLiteral = token.getData();
-        return SheetFunctions.constant(quotedLiteral.substring(1, quotedLiteral.length() - 1));
+        return constant(quotedLiteral.substring(1, quotedLiteral.length() - 1));
+    }
+
+    SheetFunction cellReferenceLiteral() {
+        Token<TokenType> token = consume(TokenType.CELL_REFERENCE_LITERAL);
+        return reference(token.getData());
     }
 
     /* UTILS */
