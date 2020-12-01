@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum TokenType implements ITokenType {
     STRING_LITERAL("'([^']|'')*'", false),
     NUMBER_LITERAL("[0-9]+", false),
-    IDENTIFIER_LITERAL("[a-zA-Z$][a-zA-Z$0-9]*", false),
+    CELL_REFERENCE_LITERAL("\\$?[a-zA-Z]+\\$?[0-9]+", false),
+    FUNCTION_IDENTIFIER_LITERAL("[a-zA-Z_]+", false),
     LP("("),
     RP(")"),
     COMMA(","),

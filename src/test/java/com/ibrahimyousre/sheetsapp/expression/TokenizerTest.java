@@ -32,27 +32,31 @@ class TokenizerTest {
     }
 
     @Test
-    public void testIdentifierLiteral() {
-        assertThat(tokenizer.getTokens("a")).containsExactly(
-                identifierLiteral("a", 0)
-        );
-        assertThat(tokenizer.getTokens("A")).containsExactly(
-                identifierLiteral("A", 0)
-        );
+    public void testCellReferenceLiteral() throws Exception {
         assertThat(tokenizer.getTokens("B1")).containsExactly(
-                identifierLiteral("B1", 0)
+                cellReferenceLiteral("B1", 0)
         );
         assertThat(tokenizer.getTokens("$B1")).containsExactly(
-                identifierLiteral("$B1", 0)
+                cellReferenceLiteral("$B1", 0)
         );
         assertThat(tokenizer.getTokens("B$1")).containsExactly(
-                identifierLiteral("B$1", 0)
+                cellReferenceLiteral("B$1", 0)
         );
         assertThat(tokenizer.getTokens("$B$1")).containsExactly(
-                identifierLiteral("$B$1", 0)
+                cellReferenceLiteral("$B$1", 0)
+        );
+    }
+
+    @Test
+    public void testFunctionIdentifierLiteral() {
+        assertThat(tokenizer.getTokens("a")).containsExactly(
+                functionIdentifierLiteral("a", 0)
+        );
+        assertThat(tokenizer.getTokens("A")).containsExactly(
+                functionIdentifierLiteral("A", 0)
         );
         assertThat(tokenizer.getTokens("sum")).containsExactly(
-                identifierLiteral("sum", 0)
+                functionIdentifierLiteral("sum", 0)
         );
     }
 
@@ -65,13 +69,13 @@ class TokenizerTest {
                 operationToken(MINUS, 3),
                 numberLiteral("5", 4),
                 operationToken(POWER, 5),
-                identifierLiteral("A1", 6),
+                cellReferenceLiteral("A1", 6),
                 operationToken(PLUS, 8),
-                identifierLiteral("sum", 9),
+                functionIdentifierLiteral("sum", 9),
                 operationToken(LP, 12),
-                identifierLiteral("A1", 13),
+                cellReferenceLiteral("A1", 13),
                 operationToken(RANGE, 15),
-                identifierLiteral("A5", 16),
+                cellReferenceLiteral("A5", 16),
                 operationToken(RP, 18),
                 operationToken(GT, 19),
                 numberLiteral("1", 20)
@@ -90,8 +94,12 @@ class TokenizerTest {
         return new Token(TokenType.NUMBER_LITERAL, data, startPos);
     }
 
-    public static Token identifierLiteral(String data, int startPos) {
-        return new Token(TokenType.IDENTIFIER_LITERAL, data, startPos);
+    public static Token cellReferenceLiteral(String data, int startPos) {
+        return new Token(TokenType.CELL_REFERENCE_LITERAL, data, startPos);
+    }
+
+    public static Token functionIdentifierLiteral(String data, int startPos) {
+        return new Token(FUNCTION_IDENTIFIER_LITERAL, data, startPos);
     }
 
 }
