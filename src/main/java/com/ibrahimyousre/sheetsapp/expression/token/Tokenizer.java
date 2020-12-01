@@ -1,34 +1,37 @@
 package com.ibrahimyousre.sheetsapp.expression.token;
 
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
-public class Tokenizer {
+public class Tokenizer<T extends ITokenType> {
 
-    private final TokenMatcher[] tokenMatchers;
+    private final List<TokenMatcher<T>> tokenMatchers;
 
-    public Tokenizer(ITokenType[] values) {
-        this.tokenMatchers = Stream.of(values).collect(groupingBy(ITokenType::isDeterministic)).entrySet().stream()
+    public Tokenizer(T[] values) {
+        Stream<Map.Entry<Boolean, List<T>>> stream = Stream.of(values).collect(groupingBy(T::isDeterministic))
+                .entrySet().stream();
+        this.tokenMatchers = stream
                 .flatMap(e -> {
                     if (e.getKey()) {
-                        return Stream.of(new DeterministicTokenMatcher(true, e.getValue()));
+                        return Stream.of(new DeterministicTokenMatcher<>(true, e.getValue()));
                     } else {
                         return e.getValue().stream().map(RegularTokenMatcher::new);
                     }
-                }).toArray(TokenMatcher[]::new);
+                }).collect(toList());
     }
 
-    public List<Token> getTokens(String input) {
+    public List<Token<T>> getTokens(String input) {
         char[] chars = input.toCharArray();
         int end = chars.length;
         int pos = 0;
-        ArrayList<Token> tokens = new ArrayList<>();
+        ArrayList<Token<T>> tokens = new ArrayList<>();
         while (pos < end) {
-            Token token = null;
-            for (TokenMatcher tokenMatcher : tokenMatchers) {
+            Token<T> token = null;
+            for (TokenMatcher<T> tokenMatcher : tokenMatchers) {
                 token = tokenMatcher.getTokenIfMatched(chars, pos);
                 if (token != null) { break; }
             }

@@ -3,13 +3,13 @@ package com.ibrahimyousre.sheetsapp.expression.token;
 import lombok.Value;
 
 @Value
-public class Token {
-    ITokenType type;
+public class Token<T extends ITokenType> {
+    T type;
     String data;
     int startPos;
     int length;
 
-    public Token(ITokenType type, String data, int startPos) {
+    public Token(T type, String data, int startPos) {
         if (type.isDeterministic() && data == null) {
             throw new IllegalArgumentException();
         }
@@ -19,7 +19,7 @@ public class Token {
         this.length = data.length();
     }
 
-    public Token(ITokenType type, int startPos) {
+    public Token(T type, int startPos) {
         if (!type.isDeterministic()) {
             throw new IllegalArgumentException();
         }
