@@ -1,14 +1,24 @@
 package com.ibrahimyousre.sheetsapp.expression.token;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Tokenizer {
 
     private final TokenMatcher[] tokenMatchers;
 
-    public Tokenizer(TokenMatcher... tokenMatchers) {
-        this.tokenMatchers = tokenMatchers;
+    public Tokenizer(ITokenType[] values) {
+        this.tokenMatchers = Stream.of(values).collect(groupingBy(ITokenType::isDeterministic)).entrySet().stream()
+                .flatMap(e -> {
+                    if (e.getKey()) {
+                        return Stream.of(new DeterministicTokenMatcher(true, e.getValue()));
+                    } else {
+                        return e.getValue().stream().map(RegularTokenMatcher::new);
+                    }
+                }).toArray(TokenMatcher[]::new);
     }
 
     public List<Token> getTokens(String input) {

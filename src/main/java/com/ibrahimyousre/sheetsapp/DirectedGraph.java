@@ -58,10 +58,6 @@ public class DirectedGraph<K> {
         @EqualsAndHashCode.Exclude
         Set<Node> inGoingLinks = new HashSet<>();
 
-        public Node(K key) {
-            this.key = key;
-        }
-
         public boolean isEmpty() {
             return inGoingLinks.isEmpty() && outGoingLinks.isEmpty();
         }
