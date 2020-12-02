@@ -19,20 +19,20 @@ public class EquationParser {
     SheetFunction parseEquation(String equation) {
         tokens = tokenizer.getTokens(equation);
         current = 0;
-        return equation();
+        return equationExpression();
     }
 
-    // (constant [+-])* constant
-    private SheetFunction equation() {
-        SheetFunction first = factor();
+    // (factor [+-])* factor
+    private SheetFunction equationExpression() {
+        SheetFunction first = factorExpression();
         while (canConsume(PLUS, MINUS)) {
             if (canConsume(PLUS)) {
                 consume();
-                SheetFunction second = factor();
+                SheetFunction second = factorExpression();
                 first = plus(first, second);
             } else if (canConsume(MINUS)) {
                 consume();
-                SheetFunction second = factor();
+                SheetFunction second = factorExpression();
                 first = minus(first, second);
             } else if (!isDone()) {
                 throw failExpectation(PLUS, MINUS);
@@ -41,28 +41,38 @@ public class EquationParser {
         return first;
     }
 
-    // (constant [*/])* constant
-    private SheetFunction factor() {
-        SheetFunction first = value();
+    // (value [*/])* value
+    private SheetFunction factorExpression() {
+        SheetFunction first = powerExpression();
         while (canConsume(MULTIPLY, DIVIDE)) {
             if (canConsume(MULTIPLY)) {
                 consume();
-                SheetFunction second = value();
+                SheetFunction second = powerExpression();
                 first = multiply(first, second);
             } else if (canConsume(DIVIDE)) {
                 consume();
-                SheetFunction second = value();
+                SheetFunction second = powerExpression();
                 first = divide(first, second);
             }
         }
         return first;
     }
 
+    private SheetFunction powerExpression() {
+        SheetFunction first = valueExpression();
+        if (canConsume(POWER)) {
+            consume();
+            SheetFunction second = powerExpression();
+            return power(first, second);
+        }
+        return first;
+    }
+
     // constant | (equation)
-    private SheetFunction value() {
+    private SheetFunction valueExpression() {
         if (canConsume(LP)) {
             consume();
-            SheetFunction equation = equation();
+            SheetFunction equation = equationExpression();
             consume(RP);
             return equation;
         }

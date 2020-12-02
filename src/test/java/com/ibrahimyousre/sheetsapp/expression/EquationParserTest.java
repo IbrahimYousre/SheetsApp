@@ -70,6 +70,12 @@ class EquationParserTest {
                 .isEqualTo(1);
         assertThat(equationParser.parseEquation("1+4*9/6-2*3").getValueAsDouble(sheetAccessor))
                 .isEqualTo(1);
+        assertThat(equationParser.parseEquation("5+2^2*2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(13);
+        assertThat(equationParser.parseEquation("(5+2)^2*2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(98);
+        assertThat(equationParser.parseEquation("(5+2)^(2*2)").getValueAsDouble(sheetAccessor))
+                .isEqualTo(7 * 7 * 7 * 7);
     }
 
     @Test
@@ -94,6 +100,14 @@ class EquationParserTest {
                 .isEqualTo(3);
         assertThat(equationParser.parseEquation("(((1+1)*(2+2)))").getValueAsDouble(sheetAccessor))
                 .isEqualTo(8);
+    }
+
+    @Test
+    public void testPower() throws Exception {
+        assertThat(equationParser.parseEquation("5^2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(25);
+        assertThat(equationParser.parseEquation("5^2^2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(625);
     }
 
 }

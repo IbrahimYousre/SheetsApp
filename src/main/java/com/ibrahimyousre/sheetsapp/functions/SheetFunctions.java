@@ -27,4 +27,8 @@ public final class SheetFunctions {
         return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) / b.getValueAsDouble(sheet));
     }
 
+    public static SheetFunction power(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(Math.pow(a.getValueAsDouble(sheet), b.getValueAsDouble(sheet)));
+    }
+
 }
