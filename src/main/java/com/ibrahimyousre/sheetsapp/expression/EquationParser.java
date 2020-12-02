@@ -19,20 +19,20 @@ public class EquationParser {
     SheetFunction parseEquation(String equation) {
         tokens = tokenizer.getTokens(equation);
         current = 0;
-        return equationExpression();
+        return plusMinusExpression();
     }
 
-    // (factor [+-])* factor
-    private SheetFunction equationExpression() {
-        SheetFunction first = factorExpression();
+    // (multiplyDivideExpression [+-])* multiplyDivideExpression
+    private SheetFunction plusMinusExpression() {
+        SheetFunction first = multiplyDivideExpression();
         while (canConsume(PLUS, MINUS)) {
             if (canConsume(PLUS)) {
                 consume();
-                SheetFunction second = factorExpression();
+                SheetFunction second = multiplyDivideExpression();
                 first = plus(first, second);
             } else if (canConsume(MINUS)) {
                 consume();
-                SheetFunction second = factorExpression();
+                SheetFunction second = multiplyDivideExpression();
                 first = minus(first, second);
             } else if (!isDone()) {
                 throw failExpectation(PLUS, MINUS);
@@ -41,8 +41,8 @@ public class EquationParser {
         return first;
     }
 
-    // (value [*/])* value
-    private SheetFunction factorExpression() {
+    // (powerExpression [*/])* powerExpression
+    private SheetFunction multiplyDivideExpression() {
         SheetFunction first = powerExpression();
         while (canConsume(MULTIPLY, DIVIDE)) {
             if (canConsume(MULTIPLY)) {
@@ -58,6 +58,7 @@ public class EquationParser {
         return first;
     }
 
+    // valueExpression (^ powerExpression)
     private SheetFunction powerExpression() {
         SheetFunction first = valueExpression();
         if (canConsume(POWER)) {
@@ -68,19 +69,19 @@ public class EquationParser {
         return first;
     }
 
-    // constant | (equation)
+    // literalExpression | (plusMinusExpression)
     private SheetFunction valueExpression() {
         if (canConsume(LP)) {
             consume();
-            SheetFunction equation = equationExpression();
+            SheetFunction equation = plusMinusExpression();
             consume(RP);
             return equation;
         }
-        return constant();
+        return literalExpression();
     }
 
     // numberLiteral | stringLiteral | cellReferenceLiteral
-    SheetFunction constant() {
+    SheetFunction literalExpression() {
         if (canConsume(NUMBER_LITERAL)) {
             return numberLiteral();
         } else if (canConsume(STRING_LITERAL)) {
