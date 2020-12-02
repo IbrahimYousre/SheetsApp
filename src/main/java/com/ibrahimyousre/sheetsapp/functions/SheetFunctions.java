@@ -31,6 +31,10 @@ public final class SheetFunctions {
         return (sheet) -> String.valueOf(Math.pow(a.getValueAsDouble(sheet), b.getValueAsDouble(sheet)));
     }
 
+    public static SheetFunction mod(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) % b.getValueAsDouble(sheet));
+    }
+
     public static SheetFunction negate(SheetFunction a) {
         return (sheet) -> String.valueOf(-a.getValueAsDouble(sheet));
     }

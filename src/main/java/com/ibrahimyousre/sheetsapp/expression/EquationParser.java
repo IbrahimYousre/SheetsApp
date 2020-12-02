@@ -64,10 +64,10 @@ public class EquationParser {
         return first;
     }
 
-    // (powerExpression [*/])* powerExpression
+    // (powerExpression [*/%])* powerExpression
     private SheetFunction multiplyDivideExpression() {
         SheetFunction first = powerExpression();
-        while (canConsume(MULTIPLY, DIVIDE)) {
+        while (canConsume(MULTIPLY, DIVIDE, MOD)) {
             Token<TokenType> operator = consume();
             SheetFunction second = powerExpression();
             switch (operator.getType()) {
@@ -76,6 +76,9 @@ public class EquationParser {
                     break;
                 case DIVIDE:
                     first = divide(first, second);
+                    break;
+                case MOD:
+                    first = mod(first, second);
                     break;
             }
         }

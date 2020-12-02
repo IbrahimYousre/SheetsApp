@@ -111,6 +111,18 @@ class EquationParserTest {
     }
 
     @Test
+    public void testMod() throws Exception {
+        assertThat(equationParser.parseEquation("10%3").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("10%3%2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("(10%3)%2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("10%(3%2)").getValueAsDouble(sheetAccessor))
+                .isEqualTo(0);
+    }
+
+    @Test
     public void testUnaryMinus() throws Exception {
         assertThat(equationParser.parseEquation("1+-2").getValueAsDouble(sheetAccessor))
                 .isEqualTo(-1);
