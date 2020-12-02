@@ -26,16 +26,15 @@ public class EquationParser {
     private SheetFunction plusMinusExpression() {
         SheetFunction first = multiplyDivideExpression();
         while (canConsume(PLUS, MINUS)) {
-            if (canConsume(PLUS)) {
-                consume();
-                SheetFunction second = multiplyDivideExpression();
-                first = plus(first, second);
-            } else if (canConsume(MINUS)) {
-                consume();
-                SheetFunction second = multiplyDivideExpression();
-                first = minus(first, second);
-            } else if (!isDone()) {
-                throw failExpectation(PLUS, MINUS);
+            Token<TokenType> operator = consume();
+            SheetFunction second = multiplyDivideExpression();
+            switch (operator.getType()) {
+                case PLUS:
+                    first = plus(first, second);
+                    break;
+                case MINUS:
+                    first = minus(first, second);
+                    break;
             }
         }
         return first;
@@ -45,14 +44,15 @@ public class EquationParser {
     private SheetFunction multiplyDivideExpression() {
         SheetFunction first = powerExpression();
         while (canConsume(MULTIPLY, DIVIDE)) {
-            if (canConsume(MULTIPLY)) {
-                consume();
-                SheetFunction second = powerExpression();
-                first = multiply(first, second);
-            } else if (canConsume(DIVIDE)) {
-                consume();
-                SheetFunction second = powerExpression();
-                first = divide(first, second);
+            Token<TokenType> operator = consume();
+            SheetFunction second = powerExpression();
+            switch (operator.getType()) {
+                case MULTIPLY:
+                    first = multiply(first, second);
+                    break;
+                case DIVIDE:
+                    first = divide(first, second);
+                    break;
             }
         }
         return first;
