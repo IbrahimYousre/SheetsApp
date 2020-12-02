@@ -43,21 +43,33 @@ public class EquationParser {
 
     // (constant [*/])* constant
     private SheetFunction factor() {
-        SheetFunction first = constant();
+        SheetFunction first = value();
         while (canConsume(MULTIPLY, DIVIDE)) {
             if (canConsume(MULTIPLY)) {
                 consume();
-                SheetFunction second = constant();
+                SheetFunction second = value();
                 first = multiply(first, second);
             } else if (canConsume(DIVIDE)) {
                 consume();
-                SheetFunction second = constant();
+                SheetFunction second = value();
                 first = divide(first, second);
             }
         }
         return first;
     }
 
+    // constant | (equation)
+    private SheetFunction value() {
+        if (canConsume(LP)) {
+            consume();
+            SheetFunction equation = equation();
+            consume(RP);
+            return equation;
+        }
+        return constant();
+    }
+
+    // numberLiteral | stringLiteral | cellReferenceLiteral
     SheetFunction constant() {
         if (canConsume(NUMBER_LITERAL)) {
             return numberLiteral();

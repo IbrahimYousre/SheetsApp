@@ -86,4 +86,14 @@ class EquationParserTest {
                 .isEqualTo(1);
     }
 
+    @Test
+    public void testParenthesesWorkCorrectly() throws Exception {
+        assertThat(equationParser.parseEquation("(1+2)").getValueAsDouble(sheetAccessor))
+                .isEqualTo(3);
+        assertThat(equationParser.parseEquation("(((1)+(2)))").getValueAsDouble(sheetAccessor))
+                .isEqualTo(3);
+        assertThat(equationParser.parseEquation("(((1+1)*(2+2)))").getValueAsDouble(sheetAccessor))
+                .isEqualTo(8);
+    }
+
 }
