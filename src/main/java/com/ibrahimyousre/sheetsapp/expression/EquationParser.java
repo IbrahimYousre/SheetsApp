@@ -23,7 +23,7 @@ public class EquationParser {
     }
 
     private SheetFunction equation() {
-        SheetFunction first = constant();
+        SheetFunction first = factor();
         if (canConsume(PLUS)) {
             consume();
             return plus(first, equation());
@@ -32,6 +32,18 @@ public class EquationParser {
             return minus(first, equation());
         } else if (!isDone()) {
             throw failExpectation(PLUS, MINUS);
+        }
+        return first;
+    }
+
+    private SheetFunction factor() {
+        SheetFunction first = constant();
+        if (canConsume(MULTIPLY)) {
+            consume();
+            return multiply(first, equation());
+        } else if (canConsume(DIVIDE)) {
+            consume();
+            return divide(first, equation());
         }
         return first;
     }

@@ -50,4 +50,14 @@ class EquationParserTest {
                 .isEqualTo(4);
     }
 
+    @Test
+    public void testParseMultiplyDivide() throws Exception {
+        assertThat(equationParser.parseEquation("10*5").getValueAsDouble(sheetAccessor))
+                .isEqualTo(50);
+        assertThat(equationParser.parseEquation("10/5").getValueAsDouble(sheetAccessor))
+                .isEqualTo(2);
+        assertThat(equationParser.parseEquation("1*1*1*1").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+    }
+
 }
