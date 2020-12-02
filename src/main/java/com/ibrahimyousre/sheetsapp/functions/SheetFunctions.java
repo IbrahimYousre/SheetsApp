@@ -11,11 +11,11 @@ public final class SheetFunctions {
         return (sheet) -> sheet.get(cell);
     }
 
-    public static SheetFunction sum(SheetFunction a, SheetFunction b) {
+    public static SheetFunction plus(SheetFunction a, SheetFunction b) {
         return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) + b.getValueAsDouble(sheet));
     }
 
-    public static SheetFunction subtract(SheetFunction a, SheetFunction b) {
+    public static SheetFunction minus(SheetFunction a, SheetFunction b) {
         return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) - b.getValueAsDouble(sheet));
     }
 

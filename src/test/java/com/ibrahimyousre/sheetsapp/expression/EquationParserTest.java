@@ -19,13 +19,13 @@ class EquationParserTest {
 
     @Test
     public void testParseNumberLiteral() throws Exception {
-        assertThat(equationParser.parseEquation("1").getValue(null))
+        assertThat(equationParser.parseEquation("1").getValue(sheetAccessor))
                 .isEqualTo("1");
     }
 
     @Test
     public void testParseStringLiteral() throws Exception {
-        assertThat(equationParser.parseEquation("'Hello World'").getValue(null))
+        assertThat(equationParser.parseEquation("'Hello World'").getValue(sheetAccessor))
                 .isEqualTo("Hello World");
     }
 
@@ -38,6 +38,14 @@ class EquationParserTest {
         assertThat(equationParser.parseEquation("B1").getValue(sheetAccessor))
                 .isEqualTo("2");
 
+    }
+
+    @Test
+    public void testParsePlusMinus() throws Exception {
+        assertThat(equationParser.parseEquation("10+5").getValue(sheetAccessor))
+                .isEqualTo("15.0");
+        assertThat(equationParser.parseEquation("10-5").getValue(sheetAccessor))
+                .isEqualTo("5.0");
     }
 
 }

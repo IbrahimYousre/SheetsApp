@@ -1,5 +1,6 @@
 package com.ibrahimyousre.sheetsapp.expression;
 
+import static com.ibrahimyousre.sheetsapp.expression.TokenType.*;
 import static com.ibrahimyousre.sheetsapp.functions.SheetFunctions.*;
 
 import java.util.List;
@@ -17,44 +18,67 @@ public class EquationParser {
     SheetFunction parseEquation(String equation) {
         tokens = tokenizer.getTokens(equation);
         current = 0;
-        return constantLiteral();
+        return equation();
+    }
+
+    private SheetFunction equation() {
+        SheetFunction first = constantLiteral();
+        if (isDone()) {
+            return first;
+        } else if (canConsume(PLUS)) {
+            consume();
+            return plus(first, constantLiteral());
+        } else if (canConsume(MINUS)) {
+            consume();
+            return minus(first, constantLiteral());
+        } else {
+            throw failExpectation(PLUS, MINUS);
+        }
     }
 
     SheetFunction constantLiteral() {
-        if (accept(TokenType.NUMBER_LITERAL)) {
+        if (canConsume(NUMBER_LITERAL)) {
             return numberLiteral();
-        } else if (accept(TokenType.STRING_LITERAL)) {
+        } else if (canConsume(STRING_LITERAL)) {
             return stringLiteral();
-        } else if (accept(TokenType.CELL_REFERENCE_LITERAL)) {
+        } else if (canConsume(CELL_REFERENCE_LITERAL)) {
             return cellReferenceLiteral();
         } else {
-            throw failExpectation(TokenType.NUMBER_LITERAL, TokenType.STRING_LITERAL);
+            throw failExpectation(NUMBER_LITERAL, STRING_LITERAL);
         }
     }
 
     SheetFunction numberLiteral() {
-        Token<TokenType> token = consume(TokenType.NUMBER_LITERAL);
+        Token<TokenType> token = consume(NUMBER_LITERAL);
         return constant(token.getData());
     }
 
     SheetFunction stringLiteral() {
-        Token<TokenType> token = consume(TokenType.STRING_LITERAL);
+        Token<TokenType> token = consume(STRING_LITERAL);
         String quotedLiteral = token.getData();
         return constant(quotedLiteral.substring(1, quotedLiteral.length() - 1));
     }
 
     SheetFunction cellReferenceLiteral() {
-        Token<TokenType> token = consume(TokenType.CELL_REFERENCE_LITERAL);
+        Token<TokenType> token = consume(CELL_REFERENCE_LITERAL);
         return reference(token.getData());
     }
 
     /* UTILS */
 
-    boolean accept(TokenType expected) {
+    boolean isDone() {
+        return current >= tokens.size();
+    }
+
+    boolean canConsume(TokenType expected) {
         if (expected == tokens.get(current).getType()) {
             return true;
         }
         return false;
+    }
+
+    Token<TokenType> consume() {
+        return tokens.get(current++);
     }
 
     Token<TokenType> consume(TokenType expected) {

@@ -102,7 +102,7 @@ class CalculationSheetTest {
     public void testSumTwoColumns() {
         sheet.set("A1", mockExpressionForFunction(constant("2")));
         sheet.set("B1", mockExpressionForFunction(constant("3")));
-        sheet.set("C1", mockExpressionForFunction(sum(reference("A1"), reference("B1"))));
+        sheet.set("C1", mockExpressionForFunction(plus(reference("A1"), reference("B1"))));
         assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(5);
     }
 
@@ -110,7 +110,7 @@ class CalculationSheetTest {
     public void testSubtractTwoColumns() {
         sheet.set("A1", mockExpressionForFunction(constant("10")));
         sheet.set("B1", mockExpressionForFunction(constant("3")));
-        sheet.set("C1", mockExpressionForFunction(subtract(reference("A1"), reference("B1"))));
+        sheet.set("C1", mockExpressionForFunction(minus(reference("A1"), reference("B1"))));
         assertThat(Double.parseDouble(sheet.get("C1"))).isEqualTo(7);
     }
 
