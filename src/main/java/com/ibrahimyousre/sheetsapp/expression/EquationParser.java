@@ -22,28 +22,38 @@ public class EquationParser {
         return equation();
     }
 
+    // (constant [+-])* constant
     private SheetFunction equation() {
         SheetFunction first = factor();
-        if (canConsume(PLUS)) {
-            consume();
-            return plus(first, equation());
-        } else if (canConsume(MINUS)) {
-            consume();
-            return minus(first, equation());
-        } else if (!isDone()) {
-            throw failExpectation(PLUS, MINUS);
+        while (canConsume(PLUS, MINUS)) {
+            if (canConsume(PLUS)) {
+                consume();
+                SheetFunction second = factor();
+                first = plus(first, second);
+            } else if (canConsume(MINUS)) {
+                consume();
+                SheetFunction second = factor();
+                first = minus(first, second);
+            } else if (!isDone()) {
+                throw failExpectation(PLUS, MINUS);
+            }
         }
         return first;
     }
 
+    // (constant [*/])* constant
     private SheetFunction factor() {
         SheetFunction first = constant();
-        if (canConsume(MULTIPLY)) {
-            consume();
-            return multiply(first, equation());
-        } else if (canConsume(DIVIDE)) {
-            consume();
-            return divide(first, equation());
+        while (canConsume(MULTIPLY, DIVIDE)) {
+            if (canConsume(MULTIPLY)) {
+                consume();
+                SheetFunction second = constant();
+                first = multiply(first, second);
+            } else if (canConsume(DIVIDE)) {
+                consume();
+                SheetFunction second = constant();
+                first = divide(first, second);
+            }
         }
         return first;
     }
@@ -87,6 +97,10 @@ public class EquationParser {
             return true;
         }
         return false;
+    }
+
+    boolean canConsume(TokenType... expected) {
+        return Stream.of(expected).anyMatch(this::canConsume);
     }
 
     Token<TokenType> consume() {

@@ -48,6 +48,8 @@ class EquationParserTest {
                 .isEqualTo(5);
         assertThat(equationParser.parseEquation("1+1+1+1").getValueAsDouble(sheetAccessor))
                 .isEqualTo(4);
+        assertThat(equationParser.parseEquation("0-1+2-3").getValueAsDouble(sheetAccessor))
+                .isEqualTo(-2);
     }
 
     @Test
@@ -57,6 +59,30 @@ class EquationParserTest {
         assertThat(equationParser.parseEquation("10/5").getValueAsDouble(sheetAccessor))
                 .isEqualTo(2);
         assertThat(equationParser.parseEquation("1*1*1*1").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("10/2*5/2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(12.5);
+    }
+
+    @Test
+    public void testBasicArithmeticOperationsPrecedence() throws Exception {
+        assertThat(equationParser.parseEquation("1-2*3+4*9/6").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("1+4*9/6-2*3").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void testBasicArithmeticOperationsPrecedenceWithCellReferences() throws Exception {
+        when(sheetAccessor.get("A1")).thenReturn("1");
+        when(sheetAccessor.get("A2")).thenReturn("2");
+        when(sheetAccessor.get("A3")).thenReturn("3");
+        when(sheetAccessor.get("A4")).thenReturn("4");
+        when(sheetAccessor.get("A6")).thenReturn("6");
+        when(sheetAccessor.get("A9")).thenReturn("9");
+        assertThat(equationParser.parseEquation("A1-A2*A3+A4*A9/A6").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("A1+A4*A9/A6-A2*A3").getValueAsDouble(sheetAccessor))
                 .isEqualTo(1);
     }
 
