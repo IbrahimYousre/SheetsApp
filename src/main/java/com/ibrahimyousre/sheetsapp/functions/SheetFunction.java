@@ -9,4 +9,8 @@ public interface SheetFunction {
         return Double.parseDouble(getValue(sheetAccessor));
     }
 
+    default boolean getValueAsBoolean(SheetAccessor sheetAccessor) {
+        return Boolean.parseBoolean(getValue(sheetAccessor));
+    }
+
 }

@@ -19,7 +19,31 @@ public class EquationParser {
     SheetFunction parseEquation(String equation) {
         tokens = tokenizer.getTokens(equation);
         current = 0;
-        return plusMinusExpression();
+        return comparisonExpression();
+    }
+
+    // plusMinusExpression | (plusMinusExpression ==|!=|>|>=|<|<= plusMinusExpression)
+    private SheetFunction comparisonExpression() {
+        SheetFunction a = plusMinusExpression();
+        if (canConsume(EQ, NE, GT, GE, LT, LE)) {
+            Token<TokenType> operator = consume();
+            SheetFunction b = plusMinusExpression();
+            switch (operator.getType()) {
+                case EQ:
+                    return eq(a, b);
+                case NE:
+                    return ne(a, b);
+                case GT:
+                    return gt(a, b);
+                case GE:
+                    return ge(a, b);
+                case LT:
+                    return lt(a, b);
+                case LE:
+                    return le(a, b);
+            }
+        }
+        return a;
     }
 
     // (multiplyDivideExpression [+-])* multiplyDivideExpression
@@ -69,7 +93,7 @@ public class EquationParser {
         return first;
     }
 
-    // [-] valueExpression
+    // valueExpression | - valueExpression
     private SheetFunction possiblyNegativeExpression() {
         if (canConsume(MINUS)) {
             consume();
@@ -79,11 +103,11 @@ public class EquationParser {
         }
     }
 
-    // literalExpression | (plusMinusExpression)
+    // literalExpression | (comparisonExpression)
     private SheetFunction valueExpression() {
         if (canConsume(LP)) {
             consume();
-            SheetFunction equation = plusMinusExpression();
+            SheetFunction equation = comparisonExpression();
             consume(RP);
             return equation;
         }

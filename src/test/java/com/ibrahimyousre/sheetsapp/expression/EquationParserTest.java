@@ -126,4 +126,63 @@ class EquationParserTest {
                 .isEqualTo(.5);
     }
 
+    @Test
+    public void testEqual() throws Exception {
+        assertThat(equationParser.parseEquation("1==2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+        assertThat(equationParser.parseEquation("2==2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        testNotEqual();
+    }
+
+
+    @Test
+    public void testNotEqual() {
+        assertThat(equationParser.parseEquation("1!=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        assertThat(equationParser.parseEquation("2!=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+    }
+
+    @Test
+    public void testLessThan() {
+        assertThat(equationParser.parseEquation("1<2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        assertThat(equationParser.parseEquation("2<2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+        assertThat(equationParser.parseEquation("3<2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+    }
+
+    @Test
+    public void testLessOrEqual() {
+        assertThat(equationParser.parseEquation("1<=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        assertThat(equationParser.parseEquation("2<=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        assertThat(equationParser.parseEquation("3<=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+    }
+
+    @Test
+    public void testGreaterThan() {
+        assertThat(equationParser.parseEquation("1>2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+        assertThat(equationParser.parseEquation("2>2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+        assertThat(equationParser.parseEquation("3>2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        testGreaterOrEqual();
+    }
+
+    @Test
+    public void testGreaterOrEqual() {
+        assertThat(equationParser.parseEquation("1>=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(false);
+        assertThat(equationParser.parseEquation("2>=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+        assertThat(equationParser.parseEquation("3>=2").getValueAsBoolean(sheetAccessor))
+                .isEqualTo(true);
+    }
+
 }

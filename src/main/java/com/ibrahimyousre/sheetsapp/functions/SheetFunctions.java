@@ -35,4 +35,28 @@ public final class SheetFunctions {
         return (sheet) -> String.valueOf(-a.getValueAsDouble(sheet));
     }
 
+    public static SheetFunction eq(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) == b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction ne(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) != b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction gt(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) > b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction ge(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) >= b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction lt(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) < b.getValueAsDouble(sheet));
+    }
+
+    public static SheetFunction le(SheetFunction a, SheetFunction b) {
+        return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) <= b.getValueAsDouble(sheet));
+    }
+
 }
