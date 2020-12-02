@@ -1,5 +1,7 @@
 package com.ibrahimyousre.sheetsapp.functions;
 
+import com.ibrahimyousre.sheetsapp.utils.CellUtils;
+
 public final class SheetFunctions {
     private SheetFunctions() {}
 
@@ -63,4 +65,9 @@ public final class SheetFunctions {
         return (sheet) -> String.valueOf(a.getValueAsDouble(sheet) <= b.getValueAsDouble(sheet));
     }
 
+    public static SheetFunction sum(CellRange range) {
+        return (sheet) -> String.valueOf(CellUtils.iterateCellRange(range.start, range.end, 0.0,
+                (iterInfo, seed) -> seed + Double.parseDouble(sheet.get(iterInfo.getCellName())))
+        );
+    }
 }

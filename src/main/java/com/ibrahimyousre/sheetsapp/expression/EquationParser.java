@@ -3,18 +3,23 @@ package com.ibrahimyousre.sheetsapp.expression;
 import static com.ibrahimyousre.sheetsapp.expression.TokenType.*;
 import static com.ibrahimyousre.sheetsapp.functions.SheetFunctions.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ibrahimyousre.sheetsapp.expression.token.Token;
+import com.ibrahimyousre.sheetsapp.functions.CellRange;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunctions;
 
 public class EquationParser {
-    SheetsTokenizer tokenizer = new SheetsTokenizer();
+    private final SheetsTokenizer tokenizer = new SheetsTokenizer();
+    private final FunctionResolver functionResolver;
     private List<Token<TokenType>> tokens;
     private int current;
+
+    public EquationParser(FunctionResolver functionResolver) {this.functionResolver = functionResolver;}
 
     SheetFunction parseEquation(String equation) {
         tokens = tokenizer.getTokens(equation);
@@ -106,15 +111,44 @@ public class EquationParser {
         }
     }
 
-    // literalExpression | (comparisonExpression)
+    // literalExpression | \(comparisonExpression\) | functionIdentifierLiteral\( [parameter[, parameter]*] \)
     private SheetFunction valueExpression() {
         if (canConsume(LP)) {
             consume();
             SheetFunction equation = comparisonExpression();
             consume(RP);
             return equation;
+        } else if (canConsume(FUNCTION_IDENTIFIER_LITERAL)) {
+            Token<TokenType> identifier = consume();
+            List<Object> parameters = new LinkedList<>();
+            consume(LP);
+            if (canConsume(RP)) {
+                consume();
+            } else {
+                parameters.add(parameter());
+                while (canConsume(COMMA)) {
+                    consume();
+                    parameters.add(parameter());
+                }
+            }
+            return functionResolver.resolveFunction(identifier.getData(), parameters.toArray());
         }
         return literalExpression();
+    }
+
+    private Object parameter() {
+        if (canConsume(CELL_REFERENCE_LITERAL)) {
+            Token<TokenType> firstReference = consume();
+            if (canConsume(RANGE)) {
+                consume();
+                Token<TokenType> secondReference = consume(CELL_REFERENCE_LITERAL);
+                return new CellRange(firstReference.getData(), secondReference.getData());
+            } else {
+                return reference(firstReference.getData());
+            }
+        } else {
+            return comparisonExpression();
+        }
     }
 
     // numberLiteral | stringLiteral | cellReferenceLiteral

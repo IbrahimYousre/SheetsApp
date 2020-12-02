@@ -1,13 +1,17 @@
 package com.ibrahimyousre.sheetsapp.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.ibrahimyousre.sheetsapp.functions.SheetAccessor;
+import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
+import com.ibrahimyousre.sheetsapp.functions.SheetFunctions;
 
 @ExtendWith(MockitoExtension.class)
 class EquationParserTest {
@@ -15,7 +19,11 @@ class EquationParserTest {
     @Mock
     private SheetAccessor sheetAccessor;
 
-    private final EquationParser equationParser = new EquationParser();
+    @Mock
+    private FunctionResolver functionResolver;
+
+    @InjectMocks
+    private EquationParser equationParser;
 
     @Test
     public void testParseNumberLiteral() throws Exception {
@@ -195,6 +203,33 @@ class EquationParserTest {
                 .isEqualTo(true);
         assertThat(equationParser.parseEquation("3>=2").getValueAsBoolean(sheetAccessor))
                 .isEqualTo(true);
+    }
+
+    @Test
+    public void testFunctionCall() throws Exception {
+        when(functionResolver.resolveFunction(eq("sum"), any()))
+                .then((invocation) -> {
+                    SheetFunction a = invocation.getArgument(1);
+                    SheetFunction b = invocation.getArgument(2);
+                    return SheetFunctions.plus(a, b);
+                });
+        assertThat(equationParser.parseEquation("sum(1,2)").getValueAsDouble(sheetAccessor))
+                .isEqualTo(3);
+        assertThat(equationParser.parseEquation("1+sum(2^2+2*2,5%3+1)").getValueAsDouble(sheetAccessor))
+                .isEqualTo(12);
+        assertThat(equationParser.parseEquation("sum(1,sum(2,sum(3,4)))").getValueAsDouble(sheetAccessor))
+                .isEqualTo(10);
+    }
+
+    @Test
+    public void testFunctionWithCellRange() throws Exception {
+        when(functionResolver.resolveFunction(eq("sum"), any()))
+                .then((invocation) -> SheetFunctions.sum(invocation.getArgument(1)));
+        for (int i = 1; i <= 10; i++) {
+            when(sheetAccessor.get("A" + i)).thenReturn("1");
+        }
+        assertThat(equationParser.parseEquation("sum(A1:A10)").getValueAsDouble(sheetAccessor))
+                .isEqualTo(10);
     }
 
 }

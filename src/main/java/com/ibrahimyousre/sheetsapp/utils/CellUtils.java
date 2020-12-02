@@ -1,6 +1,7 @@
 package com.ibrahimyousre.sheetsapp.utils;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import lombok.Getter;
@@ -75,6 +76,14 @@ public final class CellUtils {
     }
 
     public static void iterateCellRange(String startCell, String endCell, Consumer<CellIteratorInformation> callback) {
+        iterateCellRange(startCell, endCell, null, (iterInfo, seed) -> {
+            callback.accept(iterInfo);
+            return null;
+        });
+    }
+
+    public static <T> T iterateCellRange(String startCell, String endCell, T seed,
+            BiFunction<CellIteratorInformation, T, T> callback) {
         RangeInformation rangeInformation = getRangeInformation(startCell, endCell);
         CellIteratorInformation cell = new CellIteratorInformation();
         for (int row = rangeInformation.startRow; row <= rangeInformation.endRow; row++) {
@@ -83,9 +92,10 @@ public final class CellUtils {
                 cell.col = col;
                 cell.offsetRow = row - rangeInformation.startRow;
                 cell.offsetCol = col - rangeInformation.startCol;
-                callback.accept(cell);
+                seed = callback.apply(cell, seed);
             }
         }
+        return seed;
     }
 
     @Value
