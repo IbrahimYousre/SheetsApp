@@ -110,4 +110,20 @@ class EquationParserTest {
                 .isEqualTo(625);
     }
 
+    @Test
+    public void testUnaryMinus() throws Exception {
+        assertThat(equationParser.parseEquation("1+-2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(-1);
+        assertThat(equationParser.parseEquation("-1*2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(-2);
+        assertThat(equationParser.parseEquation("1*-2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(-2);
+        assertThat(equationParser.parseEquation("-1*-2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(2);
+        assertThat(equationParser.parseEquation("-1^2").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
+        assertThat(equationParser.parseEquation("2^-1").getValueAsDouble(sheetAccessor))
+                .isEqualTo(.5);
+    }
+
 }

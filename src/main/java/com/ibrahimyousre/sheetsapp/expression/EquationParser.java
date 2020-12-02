@@ -58,15 +58,25 @@ public class EquationParser {
         return first;
     }
 
-    // valueExpression (^ powerExpression)
+    // possiblyNegativeExpression (^ powerExpression)
     private SheetFunction powerExpression() {
-        SheetFunction first = valueExpression();
+        SheetFunction first = possiblyNegativeExpression();
         if (canConsume(POWER)) {
             consume();
             SheetFunction second = powerExpression();
             return power(first, second);
         }
         return first;
+    }
+
+    // [-] valueExpression
+    private SheetFunction possiblyNegativeExpression() {
+        if (canConsume(MINUS)) {
+            consume();
+            return negate(valueExpression());
+        } else {
+            return valueExpression();
+        }
     }
 
     // literalExpression | (plusMinusExpression)
