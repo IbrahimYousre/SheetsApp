@@ -32,20 +32,22 @@ class EquationParserTest {
     @Test
     public void testParseCellReference() throws Exception {
         when(sheetAccessor.get("A1")).thenReturn("1");
-        assertThat(equationParser.parseEquation("A1").getValue(sheetAccessor))
-                .isEqualTo("1");
+        assertThat(equationParser.parseEquation("A1").getValueAsDouble(sheetAccessor))
+                .isEqualTo(1);
         when(sheetAccessor.get("B1")).thenReturn("2");
-        assertThat(equationParser.parseEquation("B1").getValue(sheetAccessor))
-                .isEqualTo("2");
+        assertThat(equationParser.parseEquation("B1").getValueAsDouble(sheetAccessor))
+                .isEqualTo(2);
 
     }
 
     @Test
     public void testParsePlusMinus() throws Exception {
-        assertThat(equationParser.parseEquation("10+5").getValue(sheetAccessor))
-                .isEqualTo("15.0");
-        assertThat(equationParser.parseEquation("10-5").getValue(sheetAccessor))
-                .isEqualTo("5.0");
+        assertThat(equationParser.parseEquation("10+5").getValueAsDouble(sheetAccessor))
+                .isEqualTo(15);
+        assertThat(equationParser.parseEquation("10-5").getValueAsDouble(sheetAccessor))
+                .isEqualTo(5);
+        assertThat(equationParser.parseEquation("1+1+1+1").getValueAsDouble(sheetAccessor))
+                .isEqualTo(4);
     }
 
 }

@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import com.ibrahimyousre.sheetsapp.expression.token.Token;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
+import com.ibrahimyousre.sheetsapp.functions.SheetFunctions;
 
 public class EquationParser {
     SheetsTokenizer tokenizer = new SheetsTokenizer();
@@ -22,21 +23,20 @@ public class EquationParser {
     }
 
     private SheetFunction equation() {
-        SheetFunction first = constantLiteral();
-        if (isDone()) {
-            return first;
-        } else if (canConsume(PLUS)) {
+        SheetFunction first = constant();
+        if (canConsume(PLUS)) {
             consume();
-            return plus(first, constantLiteral());
+            return plus(first, equation());
         } else if (canConsume(MINUS)) {
             consume();
-            return minus(first, constantLiteral());
-        } else {
+            return minus(first, equation());
+        } else if (!isDone()) {
             throw failExpectation(PLUS, MINUS);
         }
+        return first;
     }
 
-    SheetFunction constantLiteral() {
+    SheetFunction constant() {
         if (canConsume(NUMBER_LITERAL)) {
             return numberLiteral();
         } else if (canConsume(STRING_LITERAL)) {
@@ -50,13 +50,13 @@ public class EquationParser {
 
     SheetFunction numberLiteral() {
         Token<TokenType> token = consume(NUMBER_LITERAL);
-        return constant(token.getData());
+        return SheetFunctions.constant(token.getData());
     }
 
     SheetFunction stringLiteral() {
         Token<TokenType> token = consume(STRING_LITERAL);
         String quotedLiteral = token.getData();
-        return constant(quotedLiteral.substring(1, quotedLiteral.length() - 1));
+        return SheetFunctions.constant(quotedLiteral.substring(1, quotedLiteral.length() - 1));
     }
 
     SheetFunction cellReferenceLiteral() {
@@ -71,7 +71,7 @@ public class EquationParser {
     }
 
     boolean canConsume(TokenType expected) {
-        if (expected == tokens.get(current).getType()) {
+        if (!isDone() && expected == tokens.get(current).getType()) {
             return true;
         }
         return false;
