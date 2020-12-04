@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.ibrahimyousre.sheetsapp.expression.EquationParser;
 import com.ibrahimyousre.sheetsapp.expression.ExpressionParserImpl;
 
 class CalculationSheetIntegrationTest {
@@ -13,7 +12,7 @@ class CalculationSheetIntegrationTest {
 
     @BeforeEach
     public void setup() {
-        sheet = new CalculationSheet(new ExpressionParserImpl(new EquationParser(null)));
+        sheet = new CalculationSheet(new ExpressionParserImpl(null));
     }
 
     @Test

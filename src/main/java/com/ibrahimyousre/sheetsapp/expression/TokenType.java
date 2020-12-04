@@ -5,6 +5,7 @@ import com.ibrahimyousre.sheetsapp.expression.token.ITokenType;
 import lombok.Getter;
 
 public enum TokenType implements ITokenType {
+
     STRING_LITERAL("'([^']|'')*'", true),
     NUMBER_LITERAL("[0-9]+", true),
     CELL_REFERENCE_LITERAL("\\$?[a-zA-Z]+\\$?[0-9]+", true),

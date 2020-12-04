@@ -13,22 +13,33 @@ import com.ibrahimyousre.sheetsapp.functions.CellRange;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunction;
 import com.ibrahimyousre.sheetsapp.functions.SheetFunctions;
 
-public class EquationParser {
+class InternalExpressionParser implements ExpressionParser {
+
     private final SheetsTokenizer tokenizer = new SheetsTokenizer();
     private final FunctionResolver functionResolver;
+
     private List<Token<TokenType>> tokens;
     private int current;
 
-    public EquationParser(FunctionResolver functionResolver) {this.functionResolver = functionResolver;}
+    public InternalExpressionParser(FunctionResolver functionResolver) {this.functionResolver = functionResolver;}
 
-    SheetFunction parseEquation(String equation) {
-        tokens = tokenizer.getTokens(equation);
-        current = 0;
-        return comparisonExpression();
+    @Override
+    public SheetFunction parse(String expression) {
+        if (!expression.startsWith("=")) {
+            return constant(expression);
+        } else {
+            return parseEquation(expression.substring(1));
+        }
     }
 
-    // plusMinusExpression | (plusMinusExpression ==|!=|>|>=|<|<= plusMinusExpression)
-    private SheetFunction comparisonExpression() {
+    private SheetFunction parseEquation(String equation) {
+        tokens = tokenizer.getTokens(equation);
+        current = 0;
+        return comparisonOrPlusMinusExpression();
+    }
+
+    // (plusMinusExpression ==|!=|>|>=|<|<= plusMinusExpression) | plusMinusExpression
+    private SheetFunction comparisonOrPlusMinusExpression() {
         SheetFunction a = plusMinusExpression();
         if (canConsume(EQ, NE, GT, GE, LT, LE)) {
             Token<TokenType> operator = consume();
@@ -51,12 +62,12 @@ public class EquationParser {
         return a;
     }
 
-    // (multiplyDivideExpression [+-])* multiplyDivideExpression
+    // (multiplyDivideModExpression [+-])* multiplyDivideModExpression
     private SheetFunction plusMinusExpression() {
-        SheetFunction first = multiplyDivideExpression();
+        SheetFunction first = multiplyDivideModExpression();
         while (canConsume(PLUS, MINUS)) {
             Token<TokenType> operator = consume();
-            SheetFunction second = multiplyDivideExpression();
+            SheetFunction second = multiplyDivideModExpression();
             switch (operator.getType()) {
                 case PLUS:
                     first = plus(first, second);
@@ -70,7 +81,7 @@ public class EquationParser {
     }
 
     // (powerExpression [*/%])* powerExpression
-    private SheetFunction multiplyDivideExpression() {
+    private SheetFunction multiplyDivideModExpression() {
         SheetFunction first = powerExpression();
         while (canConsume(MULTIPLY, DIVIDE, MOD)) {
             Token<TokenType> operator = consume();
@@ -115,7 +126,7 @@ public class EquationParser {
     private SheetFunction valueExpression() {
         if (canConsume(LP)) {
             consume();
-            SheetFunction equation = comparisonExpression();
+            SheetFunction equation = comparisonOrPlusMinusExpression();
             consume(RP);
             return equation;
         } else if (canConsume(FUNCTION_IDENTIFIER_LITERAL)) {
@@ -126,10 +137,11 @@ public class EquationParser {
                 consume();
             } else {
                 parameters.add(parameter());
-                while (canConsume(COMMA)) {
-                    consume();
+                while (!canConsume(RP)) {
+                    consume(COMMA);
                     parameters.add(parameter());
                 }
+                consume();
             }
             return functionResolver.resolveFunction(identifier.getData(), parameters.toArray());
         }
@@ -147,7 +159,7 @@ public class EquationParser {
                 return reference(firstReference.getData());
             }
         } else {
-            return comparisonExpression();
+            return comparisonOrPlusMinusExpression();
         }
     }
 
@@ -160,7 +172,7 @@ public class EquationParser {
         } else if (canConsume(CELL_REFERENCE_LITERAL)) {
             return cellReferenceLiteral();
         } else {
-            throw failExpectation(NUMBER_LITERAL, STRING_LITERAL);
+            throw failExpectation(NUMBER_LITERAL, STRING_LITERAL, CELL_REFERENCE_LITERAL);
         }
     }
 
@@ -187,10 +199,7 @@ public class EquationParser {
     }
 
     boolean canConsume(TokenType expected) {
-        if (!isDone() && expected == tokens.get(current).getType()) {
-            return true;
-        }
-        return false;
+        return !isDone() && expected == tokens.get(current).getType();
     }
 
     boolean canConsume(TokenType... expected) {
@@ -202,19 +211,21 @@ public class EquationParser {
     }
 
     Token<TokenType> consume(TokenType expected) {
-        if (expected == tokens.get(current).getType()) {
-            return tokens.get(current++);
+        if (canConsume(expected)) {
+            return consume();
         }
         throw failExpectation(expected);
     }
 
-    private RuntimeException failExpectation(TokenType expected) {
-        return new ParsingException("Expecting token of type (" + expected + ") instead found " + tokens.get(current));
+    private RuntimeException failExpectation(TokenType expectedTypes) {
+        String expected = expectedTypes.name();
+        Token<TokenType> actual = isDone() ? null : tokens.get(current);
+        return ParsingException.unexpectedTokenException(expected, actual, current);
     }
 
     private RuntimeException failExpectation(TokenType... expectedTypes) {
-        String expected = Stream.of(expectedTypes).map(Enum::name)
-                .collect(Collectors.joining(" or "));
-        return new ParsingException("Expecting token of type (" + expected + ") instead found " + tokens.get(current));
+        String expected = Stream.of(expectedTypes).map(Enum::name).collect(Collectors.joining(" or "));
+        Token<TokenType> actual = isDone() ? null : tokens.get(current);
+        return ParsingException.unexpectedTokenException(expected, actual, current);
     }
 }

@@ -21,6 +21,7 @@ class CalculationSheetTest {
     @InjectMocks
     private CalculationSheet sheet;
 
+    @SuppressWarnings("SameReturnValue")
     private String mockExpressionForFunction(SheetFunction f) {
         when(expressionParser.parse("<PLACEHOLDER>")).thenReturn(f);
         return "<PLACEHOLDER>";

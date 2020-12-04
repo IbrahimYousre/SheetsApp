@@ -9,96 +9,118 @@ import com.ibrahimyousre.sheetsapp.expression.token.Token;
 class TokenizerTest {
 
     private final SheetsTokenizer tokenizer = new SheetsTokenizer();
+    private int current;
+
+    private void reset() {
+        current = 0;
+    }
 
     @Test
     public void testStringLiteral() {
         assertThat(tokenizer.getTokens("'ibrahim'")).containsExactly(
-                stringLiteral("'ibrahim'", 0)
+                stringLiteral("'ibrahim'")
         );
+        reset();
         assertThat(tokenizer.getTokens("'ibrahim''s home'")).containsExactly(
-                stringLiteral("'ibrahim''s home'", 0)
+                stringLiteral("'ibrahim''s home'")
         );
     }
 
     @Test
     public void testNumberLiteral() {
         assertThat(tokenizer.getTokens("1")).containsExactly(
-                numberLiteral("1", 0)
+                numberLiteral("1")
         );
+        reset();
         assertThat(tokenizer.getTokens("1234")).containsExactly(
-                numberLiteral("1234", 0)
+                numberLiteral("1234")
         );
     }
 
     @Test
     public void testCellReferenceLiteral() {
         assertThat(tokenizer.getTokens("B1")).containsExactly(
-                cellReferenceLiteral("B1", 0)
+                cellReferenceLiteral("B1")
         );
+        reset();
         assertThat(tokenizer.getTokens("$B1")).containsExactly(
-                cellReferenceLiteral("$B1", 0)
+                cellReferenceLiteral("$B1")
         );
+        reset();
         assertThat(tokenizer.getTokens("B$1")).containsExactly(
-                cellReferenceLiteral("B$1", 0)
+                cellReferenceLiteral("B$1")
         );
+        reset();
         assertThat(tokenizer.getTokens("$B$1")).containsExactly(
-                cellReferenceLiteral("$B$1", 0)
+                cellReferenceLiteral("$B$1")
         );
     }
 
     @Test
     public void testFunctionIdentifierLiteral() {
         assertThat(tokenizer.getTokens("a")).containsExactly(
-                functionIdentifierLiteral("a", 0)
+                functionIdentifierLiteral("a")
         );
+        reset();
         assertThat(tokenizer.getTokens("A")).containsExactly(
-                functionIdentifierLiteral("A", 0)
+                functionIdentifierLiteral("A")
         );
+        reset();
         assertThat(tokenizer.getTokens("sum")).containsExactly(
-                functionIdentifierLiteral("sum", 0)
+                functionIdentifierLiteral("sum")
         );
     }
 
     @Test
     public void testExampleExpression() {
         assertThat(tokenizer.getTokens("1*2-5^A1+sum(A1:A5)>1")).containsExactly(
-                numberLiteral("1", 0),
-                operationToken(MULTIPLY, 1),
-                numberLiteral("2", 2),
-                operationToken(MINUS, 3),
-                numberLiteral("5", 4),
-                operationToken(POWER, 5),
-                cellReferenceLiteral("A1", 6),
-                operationToken(PLUS, 8),
-                functionIdentifierLiteral("sum", 9),
-                operationToken(LP, 12),
-                cellReferenceLiteral("A1", 13),
-                operationToken(RANGE, 15),
-                cellReferenceLiteral("A5", 16),
-                operationToken(RP, 18),
-                operationToken(GT, 19),
-                numberLiteral("1", 20)
+                numberLiteral("1"),
+                operationToken(MULTIPLY),
+                numberLiteral("2"),
+                operationToken(MINUS),
+                numberLiteral("5"),
+                operationToken(POWER),
+                cellReferenceLiteral("A1"),
+                operationToken(PLUS),
+                functionIdentifierLiteral("sum"),
+                operationToken(LP),
+                cellReferenceLiteral("A1"),
+                operationToken(RANGE),
+                cellReferenceLiteral("A5"),
+                operationToken(RP),
+                operationToken(GT),
+                numberLiteral("1")
         );
     }
 
-    public static Token<TokenType> operationToken(TokenType type, int startPos) {
-        return Token.ofDeterministicToken(type, startPos);
+    private Token<TokenType> operationToken(TokenType type) {
+        Token<TokenType> tokenTypeToken = Token.ofDeterministicToken(type, current);
+        current += tokenTypeToken.getLength();
+        return tokenTypeToken;
     }
 
-    public static Token<TokenType> stringLiteral(String data, int startPos) {
-        return Token.ofRegexToken(TokenType.STRING_LITERAL, data, startPos);
+    private Token<TokenType> stringLiteral(String data) {
+        Token<TokenType> tokenTypeToken = Token.ofRegexToken(STRING_LITERAL, data, current);
+        current += tokenTypeToken.getLength();
+        return tokenTypeToken;
     }
 
-    public static Token<TokenType> numberLiteral(String data, int startPos) {
-        return Token.ofRegexToken(TokenType.NUMBER_LITERAL, data, startPos);
+    private Token<TokenType> numberLiteral(String data) {
+        Token<TokenType> tokenTypeToken = Token.ofRegexToken(NUMBER_LITERAL, data, current);
+        current += tokenTypeToken.getLength();
+        return tokenTypeToken;
     }
 
-    public static Token<TokenType> cellReferenceLiteral(String data, int startPos) {
-        return Token.ofRegexToken(TokenType.CELL_REFERENCE_LITERAL, data, startPos);
+    private Token<TokenType> cellReferenceLiteral(String data) {
+        Token<TokenType> tokenTypeToken = Token.ofRegexToken(CELL_REFERENCE_LITERAL, data, current);
+        current += tokenTypeToken.getLength();
+        return tokenTypeToken;
     }
 
-    public static Token<TokenType> functionIdentifierLiteral(String data, int startPos) {
-        return Token.ofRegexToken(FUNCTION_IDENTIFIER_LITERAL, data, startPos);
+    private Token<TokenType> functionIdentifierLiteral(String data) {
+        Token<TokenType> tokenTypeToken = Token.ofRegexToken(FUNCTION_IDENTIFIER_LITERAL, data, current);
+        current += tokenTypeToken.getLength();
+        return tokenTypeToken;
     }
 
 }
