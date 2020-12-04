@@ -5,10 +5,10 @@ import com.ibrahimyousre.sheetsapp.expression.token.ITokenType;
 import lombok.Getter;
 
 public enum TokenType implements ITokenType {
-    STRING_LITERAL("'([^']|'')*'", false),
-    NUMBER_LITERAL("[0-9]+", false),
-    CELL_REFERENCE_LITERAL("\\$?[a-zA-Z]+\\$?[0-9]+", false),
-    FUNCTION_IDENTIFIER_LITERAL("[a-zA-Z_]+", false),
+    STRING_LITERAL("'([^']|'')*'", true),
+    NUMBER_LITERAL("[0-9]+", true),
+    CELL_REFERENCE_LITERAL("\\$?[a-zA-Z]+\\$?[0-9]+", true),
+    FUNCTION_IDENTIFIER_LITERAL("[a-zA-Z_]+", true),
     LP("("),
     RP(")"),
     COMMA(","),
@@ -32,15 +32,15 @@ public enum TokenType implements ITokenType {
     @Getter
     final int length;
     @Getter
-    final boolean isDeterministic;
+    final boolean isRegex;
 
     TokenType(String value) {
-        this(value, true);
+        this(value, false);
     }
 
-    TokenType(String value, boolean isDeterministic) {
+    TokenType(String value, boolean isRegex) {
         this.value = value;
         this.length = value.length();
-        this.isDeterministic = isDeterministic;
+        this.isRegex = isRegex;
     }
 }

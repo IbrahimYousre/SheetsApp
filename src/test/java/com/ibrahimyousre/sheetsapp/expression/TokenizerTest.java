@@ -5,11 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import com.ibrahimyousre.sheetsapp.expression.token.Token;
-import com.ibrahimyousre.sheetsapp.expression.token.Tokenizer;
 
 class TokenizerTest {
 
-    private final Tokenizer tokenizer = new SheetsTokenizer();
+    private final SheetsTokenizer tokenizer = new SheetsTokenizer();
 
     @Test
     public void testStringLiteral() {
@@ -32,7 +31,7 @@ class TokenizerTest {
     }
 
     @Test
-    public void testCellReferenceLiteral() throws Exception {
+    public void testCellReferenceLiteral() {
         assertThat(tokenizer.getTokens("B1")).containsExactly(
                 cellReferenceLiteral("B1", 0)
         );
@@ -82,24 +81,24 @@ class TokenizerTest {
         );
     }
 
-    public static Token operationToken(TokenType type, int startPos) {
-        return new Token(type, startPos);
+    public static Token<TokenType> operationToken(TokenType type, int startPos) {
+        return Token.ofDeterministicToken(type, startPos);
     }
 
-    public static Token stringLiteral(String data, int startPos) {
-        return new Token(TokenType.STRING_LITERAL, data, startPos);
+    public static Token<TokenType> stringLiteral(String data, int startPos) {
+        return Token.ofRegexToken(TokenType.STRING_LITERAL, data, startPos);
     }
 
-    public static Token numberLiteral(String data, int startPos) {
-        return new Token(TokenType.NUMBER_LITERAL, data, startPos);
+    public static Token<TokenType> numberLiteral(String data, int startPos) {
+        return Token.ofRegexToken(TokenType.NUMBER_LITERAL, data, startPos);
     }
 
-    public static Token cellReferenceLiteral(String data, int startPos) {
-        return new Token(TokenType.CELL_REFERENCE_LITERAL, data, startPos);
+    public static Token<TokenType> cellReferenceLiteral(String data, int startPos) {
+        return Token.ofRegexToken(TokenType.CELL_REFERENCE_LITERAL, data, startPos);
     }
 
-    public static Token functionIdentifierLiteral(String data, int startPos) {
-        return new Token(FUNCTION_IDENTIFIER_LITERAL, data, startPos);
+    public static Token<TokenType> functionIdentifierLiteral(String data, int startPos) {
+        return Token.ofRegexToken(FUNCTION_IDENTIFIER_LITERAL, data, startPos);
     }
 
 }
